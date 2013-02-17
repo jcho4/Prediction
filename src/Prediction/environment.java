@@ -9,8 +9,8 @@ import java.io.InputStreamReader;
 
 //Assumption 1 related linked list structure
 class NodeA1{
-	double price;
-	NodeA1 next;
+	private double price;
+	private NodeA1 next;
 	public NodeA1(){
 		this.price = -1;
 		this.next = null;
@@ -33,8 +33,8 @@ class NodeA1{
 	}
 }
 class XbarYbar{
-	double Xbar;
-	double Ybar;
+	private double Xbar;
+	private double Ybar;
 	
 	public XbarYbar(double Xbar, double Ybar){
 		this.Xbar = Xbar;
@@ -50,6 +50,9 @@ class XbarYbar{
 
 
 public class environment {
+	private NodeA1 Xvalues;
+	private NodeA1 Yvalues;
+	private XbarYbar XbarYbar;
 	//Assumption 1: create data of linked list, two integers from csv file.
 	//environment function: at this point we don't take input but eventually we will take csv file 
 	public environment(File file){
@@ -80,8 +83,9 @@ public class environment {
 			FIS.close();
 			BR.close();
 			XbarYbar barValues = getAverage(head);
+			setXbarYbar(barValues);
+			setXY(head);
 			
-			//funSimulation startSimulation = new funSimulation(head); //need to adjust location
 			
 			
 		}catch (FileNotFoundException e) {
@@ -91,12 +95,73 @@ public class environment {
 	    }
 		
 	}//end of environment function
+	
+	//seperate X values and Y values from linkedlist
+	private void setXY(NodeA1 head){
+		NodeA1 current = head;
+		NodeA1 x = new NodeA1();
+		NodeA1 y = new NodeA1();
+		
+		NodeA1 currentX = x;
+		NodeA1 currentY = y;
+		while(current.getNext() != null){
+			if(currentX.getPrice() == -1){
+				currentX.setPrice(current.getPrice());
+			}
+			else{
+				currentX.setNext( new NodeA1(current.getPrice()) );
+				currentX = currentX.getNext();
+			}
+			current = current.getNext();
+		}
+		if(head.getNext() != null){
+			current = head.getNext();
+		}else{
+			//I want to throw exception and cause stop on program 
+		}
+		
+		while(current != null){
+			if(currentY.getPrice() == -1){
+				currentY.setPrice(current.getPrice());
+			}else{
+				currentY.setNext( new NodeA1(current.getPrice()) );
+				currentY = currentY.getNext();
+			}
+			current = current.getNext();
+		}
+		//finalized x and y values will be stored in global variables
+		setX(x);
+		setY(y);
+
+	}
+	private void setX(NodeA1 head){
+		this.Xvalues = head;
+	}
+	private void setY(NodeA1 head){
+		this.Yvalues= head;
+		
+	}
+	public NodeA1 getXValues(){
+		return this.Xvalues;
+	}
+	public NodeA1 getYValues(){
+		return this.Yvalues;
+	}
+	
+	
+	private void setXbarYbar(XbarYbar XY){
+		this.XbarYbar = XY;
+	}
+	public XbarYbar getXbarYbar(){
+		return this.XbarYbar;
+	}
+	
 	//get avg X or Y
 	public XbarYbar getAverage(NodeA1 start){
 		NodeA1 current = start;
 		double N = 0;
 		//N value has to be one less than what we have in the linked list
-		while (current.next != null){
+		while (current.getNext() != null){
 			N++;
 			current = current.getNext();
 		}
@@ -104,7 +169,7 @@ public class environment {
 		double Xbar = 0;
 		double Ybar = 0;
 		//find sum of X
-		while (current.next != null){
+		while (current.getNext() != null){
 			Xbar += current.getPrice();
 			current = current.getNext();
 		}
@@ -122,15 +187,19 @@ public class environment {
 		return avgXY;
 		
 		
-	}
+	}//getAverage
 	
-	//testing linked list
+	/* ################# testing functions ##########################*/
 	public void printAll(NodeA1 start){
+		int count = 0;
 		while(start != null){
+			count ++;
 			System.out.println(start.getPrice());
 			start = start.getNext();
 		}
+		System.out.println("total: " + count);
 		
 	}
+	
 	
 }//end of environment class
